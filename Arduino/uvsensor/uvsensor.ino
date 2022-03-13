@@ -28,46 +28,16 @@ void setup() {
 
 void loop() {
 	String data = "";
-	if(Serial.available()) {
-		Serial.println("Reading serial...");
-		data = Serial.readString();
-		Serial.println(data);
-	}
+
 	if(BT.available()) {
 		Serial.println("Reading BT serial...");
 		data = BT.readString();
 		Serial.println(data);
 	}
-	if(data == "0") {
-		G_LED_STATUS = toggleLed(G_LED, G_LED_STATUS);
-		String uvread = getUVIndex();
-		Serial.println(uvread);
-		BT.println(uvread);
-		G_LED_STATUS = toggleLed(G_LED, G_LED_STATUS);
-		delay(500);
-	} else if(data == "1") {
-		B_LED_STATUS = toggleLed(B_LED, B_LED_STATUS);
-		Serial.println("B_LED " + B_LED_STATUS);
-	} else if(data == "2") {
-		G_LED_STATUS = toggleLed(G_LED, G_LED_STATUS);
-		Serial.println("G_LED " + G_LED_STATUS);
-	} else if(data == "conn_on") {
-		G_LED_STATUS = toggleLed(G_LED, false);
-		B_LED_STATUS = toggleLed(B_LED, false);
-		// BT.print("B_LED: " + B_LED_STATUS);
-		BT.println(getUVIndex());
-		Serial.println("B_LED " + B_LED_STATUS);
-		G_LED_STATUS = toggleLed(G_LED, G_LED_STATUS);
-	} else if(data == "conn_off") {
-		G_LED_STATUS = toggleLed(G_LED, false);
-		B_LED_STATUS = toggleLed(B_LED, true);
-		BT.println("B_LED: " + B_LED_STATUS);
-		Serial.println("B_LED " + B_LED_STATUS);
-		G_LED_STATUS = toggleLed(G_LED, G_LED_STATUS);
-	}
-}
 
-String getUVIndex() {
+	// blink(G_LED, 1);
+	// digitalWrite(B_LED, HIGH);
+
 	int uvindex = 0;
 	int uvread = analogRead(UVSENSOR_PIN);
 
@@ -97,17 +67,36 @@ String getUVIndex() {
 		uvindex = 0;
 	}
 
-	String data = uvread + ":" + uvindex;
+	Serial.print(uvread);
+	Serial.print(":");
+	Serial.println(uvindex);
 
-	return data;
+	if(data == "conn_on") {
+		// G_LED_STATUS = toggleLed(G_LED, false);
+		// G_LED_STATUS = toggleLed(G_LED, false);
+		blink(G_LED, 1);
+		B_LED_STATUS = toggleLed(B_LED, false);
+		// digitalWrite(B_LED, HIGH);
+		// BT.print("B_LED: " + B_LED_STATUS);
+		BT.println(uvindex);
+		Serial.println(uvindex);
+		// Serial.println("B_LED: " + B_LED_STATUS);
+		G_LED_STATUS = toggleLed(G_LED, G_LED_STATUS);
+	} else if(data == "conn_off") {
+		blink(G_LED, 1);
+		B_LED_STATUS = toggleLed(B_LED, true);
+		BT.println("B_LED: " + B_LED_STATUS);
+		Serial.println("B_LED " + B_LED_STATUS);
+		G_LED_STATUS = toggleLed(G_LED, G_LED_STATUS);
+	}
 }
 
 void blink(int led, int times) {
 	for(int i = 0; i < times; i++) {
 		digitalWrite(led, HIGH);
-		delay(500);
+		delay(100);
 		digitalWrite(led, LOW);
-		delay(500);
+		delay(100);
 	}
 }
 
