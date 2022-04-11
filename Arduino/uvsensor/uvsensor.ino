@@ -11,28 +11,30 @@
 // Variables
 bool B_LED_STATUS = LOW;
 bool G_LED_STATUS = LOW;
+String data = "";
 
 // Serials
 SoftwareSerial BT(BT_TX, BT_RX);
 
 void setup() {
-	Serial.begin(9600);
-	BT.begin(9600);
+// 	Serial.begin(9600);
+	BT.begin(38400);
 	pinMode(UVSENSOR_PIN, INPUT);
 	pinMode(B_LED, OUTPUT);
 	pinMode(G_LED, OUTPUT);
 	blink(B_LED, 3);
 	blink(G_LED, 3);
-	Serial.println("Setup complete!");
+// 	Serial.println("Setup complete!");
 }
 
 void loop() {
-	String data = "";
 
 	if(BT.available()) {
-		Serial.println("Reading BT serial...");
+// 		// Serial.println("Reading BT serial...");
 		data = BT.readString();
-		Serial.println(data);
+		blink(B_LED, 1);
+		data = "conn_on";
+// 		Serial.println(data);
 	}
 
 	// blink(G_LED, 1);
@@ -67,9 +69,9 @@ void loop() {
 		uvindex = 0;
 	}
 
-	Serial.print(uvread);
-	Serial.print(":");
-	Serial.println(uvindex);
+// 	Serial.print(uvread);
+// 	Serial.print(":");
+// 	Serial.println(uvindex);
 
 	if(data == "conn_on") {
 		// G_LED_STATUS = toggleLed(G_LED, false);
@@ -78,15 +80,15 @@ void loop() {
 		B_LED_STATUS = toggleLed(B_LED, false);
 		// digitalWrite(B_LED, HIGH);
 		// BT.print("B_LED: " + B_LED_STATUS);
-		BT.println(uvindex);
-		Serial.println(uvindex);
-		// Serial.println("B_LED: " + B_LED_STATUS);
+		BT.print(uvindex + "@");
+// 		Serial.println(uvindex);
+		// // Serial.println("B_LED: " + B_LED_STATUS);
 		G_LED_STATUS = toggleLed(G_LED, G_LED_STATUS);
 	} else if(data == "conn_off") {
 		blink(G_LED, 1);
 		B_LED_STATUS = toggleLed(B_LED, true);
 		BT.println("B_LED: " + B_LED_STATUS);
-		Serial.println("B_LED " + B_LED_STATUS);
+// 		Serial.println("B_LED " + B_LED_STATUS);
 		G_LED_STATUS = toggleLed(G_LED, G_LED_STATUS);
 	}
 }
