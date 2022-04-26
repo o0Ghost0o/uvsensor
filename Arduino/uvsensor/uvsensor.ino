@@ -3,38 +3,46 @@
 
 // Pins
 #define UVSENSOR_PIN A0
-#define BT_TX 2
-#define BT_RX 3
+#define BT_RX 2
+#define BT_TX 3
 #define B_LED 6
 #define G_LED 5
 
 // Variables
 bool B_LED_STATUS = LOW;
 bool G_LED_STATUS = LOW;
-String data = "";
+bool is_nano = false;
 
 // Serials
-SoftwareSerial BT(BT_TX, BT_RX);
+SoftwareSerial BT(BT_RX, BT_TX);
 
 void setup() {
-// 	Serial.begin(9600);
-	BT.begin(38400);
+
+	if(is_nano) {
+		Serial.begin(9600);
+	}
+
+	BT.begin(9600);
 	pinMode(UVSENSOR_PIN, INPUT);
 	pinMode(B_LED, OUTPUT);
 	pinMode(G_LED, OUTPUT);
 	blink(B_LED, 3);
 	blink(G_LED, 3);
-// 	Serial.println("Setup complete!");
+	if(is_nano) {
+ 		Serial.println("Setup complete!");
+	}
 }
 
 void loop() {
+	String data = "";
 
 	if(BT.available()) {
 // 		// Serial.println("Reading BT serial...");
 		data = BT.readString();
-		blink(B_LED, 1);
-		data = "conn_on";
-// 		Serial.println(data);
+//		blink(B_LED, 1);
+		if(is_nano) {
+	 		Serial.println(data);
+		}
 	}
 
 	// blink(G_LED, 1);
@@ -74,22 +82,12 @@ void loop() {
 // 	Serial.println(uvindex);
 
 	if(data == "conn_on") {
-		// G_LED_STATUS = toggleLed(G_LED, false);
-		// G_LED_STATUS = toggleLed(G_LED, false);
 		blink(G_LED, 1);
-		B_LED_STATUS = toggleLed(B_LED, false);
-		// digitalWrite(B_LED, HIGH);
-		// BT.print("B_LED: " + B_LED_STATUS);
-		BT.print(uvindex + "@");
-// 		Serial.println(uvindex);
-		// // Serial.println("B_LED: " + B_LED_STATUS);
-		G_LED_STATUS = toggleLed(G_LED, G_LED_STATUS);
+		digitalWrite(B_LED, HIGH);
+		BT.print(String(uvread) + ":" + String(uvindex) + "@");
 	} else if(data == "conn_off") {
 		blink(G_LED, 1);
-		B_LED_STATUS = toggleLed(B_LED, true);
-		BT.println("B_LED: " + B_LED_STATUS);
-// 		Serial.println("B_LED " + B_LED_STATUS);
-		G_LED_STATUS = toggleLed(G_LED, G_LED_STATUS);
+		digitalWrite(B_LED, LOW);
 	}
 }
 
@@ -100,10 +98,4 @@ void blink(int led, int times) {
 		digitalWrite(led, LOW);
 		delay(100);
 	}
-}
-
-bool toggleLed(int led, bool status) {
-	status = !status;
-	digitalWrite(led, status);
-	return status;
 }
